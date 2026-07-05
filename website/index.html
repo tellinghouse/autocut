@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--
+  AutoCut download page — built to match tellinghouse.com.
+  Netlify: drag this "website" folder into Netlify (or connect the repo) and it's live.
+
+  Download links point to github.com/tellinghouse/autocut using GitHub's "latest
+  release" URL, so every new release you publish is downloaded automatically —
+  you never need to edit this page again. Just publish AutoCut-Setup.exe as a
+  release asset on that repo.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCut — by Tellinghouse Media</title>
+<meta name="description" content="AutoCut automatically syncs, cuts, transcribes, and clips your podcast and video footage — entirely on your own computer. A free tool from Tellinghouse Media.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF7F2;
+    --cream-2:#F5F0E8;
+    --card:#EDE6D6;
+    --ink:#1A2820;
+    --forest:#1E3326;
+    --forest-soft:#3D4F44;
+    --gold:#B8963E;
+    --burgundy:#962828;
+    --line:rgba(30,51,38,.14);
+    --display:"Playfair Display",Georgia,serif;
+    --body:"Cormorant Garamond",Georgia,serif;
+    --ui:"Jost",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:20px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  em,.gold{color:var(--gold);font-style:italic}
+  h1,h2,h3{font-family:var(--display);color:var(--forest);font-weight:700;line-height:1.12}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+  /* ---- nav ---- */
+  header{position:sticky;top:0;z-index:20;background:rgba(250,247,242,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+  .nav img{height:38px;width:auto;display:block}
+  .nav-links{display:flex;align-items:center;gap:30px;font-family:var(--ui);font-size:15px;letter-spacing:.02em;font-weight:500}
+  .nav-links a{color:var(--forest-soft)}
+  .nav-links a:hover{color:var(--gold)}
+  .btn{
+    font-family:var(--ui);font-weight:600;font-size:15px;letter-spacing:.03em;
+    background:var(--forest);color:var(--cream-2);
+    padding:13px 26px;border-radius:2px;border:1px solid var(--forest);
+    display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+    transition:background .2s,transform .2s;
+  }
+  .btn:hover{background:#16261c;transform:translateY(-1px)}
+  .btn.gold{background:var(--gold);border-color:var(--gold);color:#2a2109}
+  .btn.gold:hover{background:#a9862f}
+  .btn.ghost{background:transparent;color:var(--forest)}
+  .btn.ghost:hover{background:rgba(30,51,38,.06)}
+  @media(max-width:720px){.nav-links a:not(.btn){display:none}}
+
+  /* ---- hero ---- */
+  .hero{padding:78px 0 64px;text-align:center}
+  .eyebrow{font-family:var(--ui);font-weight:600;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+  .hero h1{font-size:clamp(44px,7vw,82px);margin-bottom:22px}
+  .hero .lede{font-size:clamp(20px,2.6vw,26px);color:var(--forest-soft);max-width:660px;margin:0 auto 38px}
+  .cta-row{display:flex;gap:16px;justify-content:center;align-items:center;flex-wrap:wrap}
+  .btn.big{font-size:17px;padding:17px 34px}
+  .meta{font-family:var(--ui);font-size:13.5px;letter-spacing:.02em;color:var(--forest-soft);margin-top:20px}
+  .meta strong{color:var(--forest);font-weight:600}
+
+  /* ---- rule / section ---- */
+  .section{padding:64px 0;border-top:1px solid var(--line)}
+  .section-head{text-align:center;max-width:680px;margin:0 auto 46px}
+  .section-head .eyebrow{margin-bottom:16px}
+  .section-head h2{font-size:clamp(32px,4.6vw,48px);margin-bottom:14px}
+  .section-head p{color:var(--forest-soft)}
+
+  /* ---- features ---- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line)}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .feat{background:var(--cream);padding:34px 30px}
+  .feat h3{font-size:24px;margin-bottom:10px}
+  .feat h3 .num{font-family:var(--ui);font-weight:600;font-size:13px;color:var(--gold);display:block;letter-spacing:.14em;margin-bottom:12px}
+  .feat p{font-size:18px;color:var(--forest-soft);line-height:1.55}
+
+  /* ---- how / steps ---- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;counter-reset:s}
+  @media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.steps{grid-template-columns:1fr}}
+  .step{position:relative;padding-top:14px}
+  .step::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-style:italic;font-size:40px;color:var(--gold);display:block;margin-bottom:8px;line-height:1}
+  .step h3{font-size:21px;margin-bottom:6px}
+  .step p{font-size:17px;color:var(--forest-soft)}
+
+  /* ---- requirements band ---- */
+  .band{background:var(--forest);color:var(--cream-2);border:none}
+  .band .section-head h2,.band h3{color:#fff}
+  .band .eyebrow{color:var(--gold)}
+  .band .section-head p{color:rgba(245,240,232,.78)}
+  .req{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;max-width:820px;margin:0 auto;text-align:center}
+  @media(max-width:720px){.req{grid-template-columns:1fr;gap:24px}}
+  .req h3{font-size:22px;margin-bottom:6px;font-family:var(--display)}
+  .req p{font-family:var(--ui);font-size:14.5px;letter-spacing:.01em;color:rgba(245,240,232,.78);line-height:1.5}
+
+  /* ---- notice ---- */
+  .notice{max-width:760px;margin:44px auto 0;background:rgba(184,150,62,.10);border:1px solid rgba(184,150,62,.4);border-radius:2px;padding:24px 28px}
+  .notice h3{font-size:20px;margin-bottom:8px}
+  .notice p{font-size:17.5px;color:var(--forest-soft)}
+  .notice code{font-family:var(--ui);font-size:14px;background:rgba(30,51,38,.08);padding:2px 7px;border-radius:2px}
+
+  /* ---- final cta ---- */
+  .final{text-align:center;padding:78px 0}
+  .final h2{font-size:clamp(34px,5vw,54px);margin-bottom:24px}
+
+  /* ---- footer ---- */
+  footer{background:var(--cream-2);border-top:1px solid var(--line);padding:48px 0;text-align:center}
+  footer img{height:34px;margin-bottom:18px}
+  footer .tag{font-family:var(--display);font-style:italic;color:var(--forest-soft);font-size:21px;line-height:1.5;margin-bottom:22px}
+  footer .fine{font-family:var(--ui);font-size:13px;letter-spacing:.02em;color:var(--forest-soft)}
+  footer a.link{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="https://www.tellinghouse.com" aria-label="Tellinghouse home">
+      <img src="https://www.tellinghouse.com/logo.png" alt="Tellinghouse">
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="https://www.tellinghouse.com">Tellinghouse&nbsp;↗</a>
+      <a class="btn" href="https://github.com/tellinghouse/autocut/releases/latest/download/AutoCut-Setup.exe">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">A free tool from Tellinghouse Media</div>
+      <h1>Tell the story.<br>Let <em>AutoCut</em> do the editing.</h1>
+      <p class="lede">AutoCut syncs your cameras, cuts to whoever's talking, writes the transcript, and clips the highlights — automatically, and entirely on your own computer.</p>
+      <div class="cta-row">
+        <a class="btn gold big" href="https://github.com/tellinghouse/autocut/releases/latest/download/AutoCut-Setup.exe">↓&nbsp; Download for Windows</a>
+        <a class="btn ghost big" href="#how">See how it works</a>
+      </div>
+      <p class="meta">Free · Windows 10 &amp; 11 · <strong>Runs 100% offline</strong> — nothing is ever uploaded</p>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">What it does</div>
+        <h2>An editor that already knows the plan.</h2>
+        <p>Drop in your footage and AutoCut handles the tedious parts — the syncing, the cutting, the captions — so you can focus on the conversation.</p>
+      </div>
+      <div class="grid">
+        <div class="feat"><h3><span class="num">MULTICAM</span>Syncs every angle</h3><p>Cameras and mics that started at different moments are lined up to one timeline automatically, by matching the audio they all picked up.</p></div>
+        <div class="feat"><h3><span class="num">THE CUT</span>Follows the conversation</h3><p>The edit switches to whoever's speaking, with a minimum shot length so it never flickers between cameras.</p></div>
+        <div class="feat"><h3><span class="num">SOLO</span>Tightens talking heads</h3><p>Single-camera video? AutoCut trims the dead air into clean jump cuts and levels your audio to podcast loudness.</p></div>
+        <div class="feat"><h3><span class="num">WORDS</span>Transcript, captions &amp; chapters</h3><p>A timestamped transcript, an .srt caption file, and paste-ready YouTube chapters — all generated on your machine.</p></div>
+        <div class="feat"><h3><span class="num">SOCIAL</span>Finds your clips</h3><p>Detects the highest-energy moments and cuts them as vertical 9:16 shorts for TikTok, Reels, and Shorts.</p></div>
+        <div class="feat"><h3><span class="num">CONTROL</span>Edit by transcript</h3><p>Delete a line of dialogue and the video re-cuts to match. Hand off a project file to Premiere, Resolve, or Final Cut anytime.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Getting started</div>
+        <h2>Installed in under a minute.</h2>
+        <p>It installs like any normal program — a Start-menu entry, a desktop icon, and a clean uninstaller.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>Download</h3><p>Grab <code>AutoCut-Setup.exe</code> using the button below.</p></div>
+        <div class="step"><h3>Run it</h3><p>Double-click the installer and follow the prompts.</p></div>
+        <div class="step"><h3>Launch</h3><p>Open AutoCut from your desktop icon; it opens in your browser.</p></div>
+        <div class="step"><h3>Make video</h3><p>Drop in footage, click once, and let it work.</p></div>
+      </div>
+
+      <div class="notice">
+        <h3>A quick heads-up on first launch</h3>
+        <p>Because AutoCut is a small independent tool, Windows may show a blue <em>"Windows protected your PC"</em> screen the first time you run it. That's expected — click <strong>More info</strong>, then <strong>Run anyway</strong>. It's completely safe.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Good to know</div>
+        <h2>Yours, and private by design.</h2>
+      </div>
+      <div class="req">
+        <div><h3>Windows 10 &amp; 11</h3><p>64-bit. A Mac version isn't available yet.</p></div>
+        <div><h3>~250 MB</h3><p>Everything is bundled — no extra setup, no accounts.</p></div>
+        <div><h3>Fully offline</h3><p>Your footage never leaves your computer. Nothing is uploaded, ever.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <h2>Ready to skip the busywork?</h2>
+      <div class="cta-row">
+        <a class="btn gold big" href="https://github.com/tellinghouse/autocut/releases/latest/download/AutoCut-Setup.exe">↓&nbsp; Download AutoCut for Windows</a>
+      </div>
+      <p class="meta">Free · No account required · <strong>Version 1.2</strong></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="https://www.tellinghouse.com/logo.png" alt="Tellinghouse">
+    <p class="tag">Stories connect us.<br>Strategy moves us.</p>
+    <p class="fine">© 2026 Tellinghouse, LLC. All rights reserved. · <a class="link" href="https://www.tellinghouse.com">tellinghouse.com</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
