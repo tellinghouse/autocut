@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tellinghouse Media -- AutoCut</title>
+<style>
+  :root {
+    --accent: #5b5bf5;
+    --accent-dark: #4444d0;
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #1c1e27;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --good: #16a34a;
+    --warn: #d97706;
+    --bad: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 32px 16px 80px;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  .brand { display:flex; align-items:center; gap:12px; margin-bottom: 18px; }
+  .brand-mark {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink:0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: white; display:flex; align-items:center; justify-content:center;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+  }
+  .brand-name {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted); margin: 0 0 2px;
+  }
+  h1 { font-size: 26px; margin: 0; line-height: 1.1; }
+  .subtitle { color: var(--muted); margin-top: 8px; margin-bottom: 28px; }
+  footer.tm-footer {
+    max-width: 780px; margin: 32px auto 0; text-align: center;
+    color: var(--muted); font-size: 12px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 16px; display:flex; align-items:center; gap:8px;}
+  .step-num {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:22px; border-radius:50%; background:var(--accent);
+    color:white; font-size:12px; font-weight:600; flex-shrink:0;
+  }
+  .mode-row { display:flex; gap:10px; margin-bottom: 16px; flex-wrap:wrap; }
+  .mode-card {
+    flex:1; min-width: 220px; display:flex; align-items:flex-start; gap:10px;
+    padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; cursor:pointer;
+  }
+  .mode-card.selected { border-color: var(--accent); background:#f6f6ff; }
+  .mode-card input { margin-top: 3px; }
+  #dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 36px 16px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  #dropzone.drag { border-color: var(--accent); background: #f1f1fe; color: var(--accent-dark); }
+  #dropzone strong { color: var(--text); }
+  .filelist { margin-top: 16px; }
+  .filerow {
+    display:flex; align-items:center; gap:10px;
+    padding: 8px 4px; border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .filerow:last-child { border-bottom: none; }
+  .filerow .name { flex: 1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .filerow .size { color: var(--muted); font-size: 12px; }
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .badge.ok { background:#dcfce7; color:var(--good); }
+  .badge.pending { background:#f3f4f6; color:var(--muted); }
+  .badge.err { background:#fee2e2; color:var(--bad); }
+  .badge.kind { background:#eef0f4; color:var(--muted); }
+  button {
+    font: inherit; cursor: pointer; border: none; border-radius: 10px;
+    padding: 12px 22px; font-weight: 600; font-size: 14px;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-primary:disabled { background: #c7c7f0; cursor: not-allowed; }
+  .btn-secondary { background: #eef0f4; color: var(--text); }
+  .btn-secondary:hover { background: #e2e4ea; }
+  .btn-small { padding: 8px 14px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px;}
+  th { text-align:left; color:var(--muted); font-weight:600; padding: 6px 8px; border-bottom:1px solid var(--border); }
+  td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  td input[type=number] { width: 78px; padding: 4px 6px; border:1px solid var(--border); border-radius:6px; font: inherit; }
+  td .tname { max-width: 220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block;}
+  .conf { font-weight:600; }
+  .conf.high { color: var(--good); }
+  .conf.med { color: var(--warn); }
+  .conf.low { color: var(--bad); }
+  .conf.none { color: var(--muted); }
+  input[type=text] {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: 10px; font: inherit;
+  }
+  select { font: inherit; padding: 6px 8px; border:1px solid var(--border); border-radius: 8px; background:white; }
+  .option-group { margin-bottom: 20px; }
+  .option-group > label.title { display:block; font-weight:600; margin-bottom:8px; font-size:14px;}
+  .radio-card {
+    display:flex; align-items:flex-start; gap:10px; padding: 12px 14px;
+    border: 1px solid var(--border); border-radius: 10px; margin-bottom:8px; cursor:pointer;
+  }
+  .radio-card:hover { border-color: var(--accent); }
+  .radio-card.disabled { opacity: 0.5; cursor: not-allowed; }
+  .radio-card.disabled:hover { border-color: var(--border); }
+  .radio-card input { margin-top: 3px; }
+  .radio-card .rtitle { font-weight: 600; font-size: 14px; }
+  .radio-card .rdesc { color: var(--muted); font-size: 13px; margin-top:2px; }
+  .inline-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:6px; font-size:13px; color:var(--muted); }
+  details { margin-top: 8px; }
+  summary { cursor:pointer; font-size: 13px; color: var(--accent-dark); font-weight:600; }
+  .adv-row { display:flex; align-items:center; gap:12px; margin: 12px 0; font-size:13px; }
+  .adv-row label { min-width: 190px; color: var(--muted); }
+  .adv-row input[type=range] { flex:1; }
+  .progresswrap { margin: 14px 0; }
+  .progressbar { height: 10px; background:#eee; border-radius: 6px; overflow:hidden; }
+  .progressbar > div { height:100%; background: var(--accent); width:0%; transition: width 0.3s; }
+  .progress-msg { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .batch-line { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .warning { background:#fffbeb; border:1px solid #fde68a; color:#92400e; padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:14px;}
+  .errorbox { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:14px;}
+  video { width:100%; border-radius: 10px; background:black; margin-bottom: 14px; }
+  .hidden { display:none !important; }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
+  .hint { font-size:12px; color:var(--muted); margin-top:4px; }
+  .savednote { font-size:12px; color:var(--muted); margin-top:12px; word-break: break-all; }
+  .color-row { border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; }
+  .color-row .cr-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-weight:600; font-size:13px; }
+  .color-previews { display:flex; gap:8px; margin:8px 0; }
+  .color-previews figure { margin:0; flex:1; }
+  .color-previews img { width:100%; border-radius:8px; background:#000; display:block; min-height:60px; }
+  .color-previews figcaption { font-size:11px; color:var(--muted); text-align:center; margin-top:2px; }
+  .cr-sliders { display:grid; grid-template-columns: 90px 1fr 44px; gap:6px 10px; align-items:center; font-size:12px; color:var(--muted); }
+  .tr-row {
+    display:flex; gap:8px; padding:6px 10px; border-bottom:1px solid var(--border);
+    font-size:13px; align-items:flex-start;
+  }
+  .tr-row:last-child { border-bottom:none; }
+  .tr-row.deleted { background:#fef2f2; }
+  .tr-row.deleted .tr-text { text-decoration:line-through; color:var(--bad); }
+  .tr-time { color:var(--muted); min-width:46px; cursor:pointer; font-variant-numeric:tabular-nums; user-select:none; }
+  .tr-time:hover { color: var(--accent-dark); }
+  .tr-speaker { cursor:pointer; user-select:none; flex-shrink:0; }
+  .tr-text { flex:1; outline:none; border-radius:4px; }
+  .tr-text:focus { background:#f6f6ff; }
+  .tr-row.hiddenrow { display:none; }
+  .result-row {
+    display:flex; align-items:center; gap:10px; padding:8px 4px;
+    border-bottom:1px solid var(--border); font-size:14px;
+  }
+  .result-row:last-child { border-bottom:none; }
+  .result-row .rlabel { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .result-info { font-size:13px; color:var(--muted); padding:6px 4px; }
+  .ep-row { display:flex; align-items:center; gap:8px; padding:6px 4px; font-size:13px; border-bottom:1px solid var(--border);}
+  .ep-row:last-child { border-bottom:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-mark">TM</div>
+    <div>
+      <p class="brand-name">Tellinghouse Media</p>
+      <h1>AutoCut</h1>
+    </div>
+  </div>
+  <p class="subtitle" id="subtitle">Drop in your camera angles. It syncs them, figures out who's talking, and cuts the show for you.</p>
+
+  <!-- STEP 1: UPLOAD -->
+  <div class="card" id="step-upload">
+    <h2><span class="step-num">1</span> What are we making?</h2>
+    <div class="mode-row">
+      <label class="mode-card selected" id="modePodcast">
+        <input type="radio" name="ptype" value="podcast" checked>
+        <div><div class="rtitle">Podcast (multi-camera)</div>
+        <div class="rdesc">Several cameras/mics. Syncs everything and cuts to whoever's talking.</div></div>
+      </label>
+      <label class="mode-card" id="modeSolo">
+        <input type="radio" name="ptype" value="solo">
+        <div><div class="rtitle">Talking head (one camera)</div>
+        <div class="rdesc">One camera, one person. Tightens pauses into jump cuts, levels audio, makes captions &amp; clips.</div></div>
+      </label>
+    </div>
+
+    <div id="dropzone">
+      <div><strong>Drag &amp; drop</strong> <span id="dropText">your camera / mic files here</span>, or click to browse</div>
+      <div class="hint" id="dropHint">Each camera's own video file is best. You can also add separate mic/recorder audio files.</div>
+    </div>
+    <input type="file" id="fileinput" multiple hidden accept="video/*,audio/*">
+    <div class="filelist" id="filelist"></div>
+    <div class="actions">
+      <button class="btn-primary" id="analyzeBtn" disabled>Analyze footage</button>
+      <button class="btn-secondary hidden" id="resetBtn1">Start over</button>
+    </div>
+
+    <details id="resumeBox" style="margin-top:18px">
+      <summary>Resume a previous session</summary>
+      <div class="hint" style="margin:8px 0">Every finished cut is saved as a project automatically. Open one to keep editing by transcript, add branding, or re-download files.</div>
+      <div id="projList"></div>
+    </details>
+
+    <details id="batchBox" style="margin-top:18px">
+      <summary>Batch a whole folder (overnight mode)</summary>
+      <div class="hint" style="margin:10px 0 6px">Point AutoCut at a folder on this computer. Each subfolder that contains a video becomes one episode, using its files and the folder's name. Files are read in place &mdash; no uploading.</div>
+      <div style="display:flex; gap:8px; margin:10px 0;">
+        <input type="text" id="batchPath" placeholder="e.g. D:\Recordings\July sessions">
+        <button class="btn-secondary btn-small" id="batchScanBtn">Scan</button>
+      </div>
+      <div id="batchList"></div>
+      <div id="batchOptions" class="hidden">
+        <div class="inline-controls">
+          <label><input type="checkbox" id="bTranscript" checked> Transcript &amp; chapters</label>
+          <label>Clips: <select id="bClips"><option value="0">none</option><option value="2">2</option><option value="3" selected>3</option><option value="5">5</option></select></label>
+          <label><input type="checkbox" id="bTighten"> Tighten pauses</label>
+          <label><input type="checkbox" id="bFcpxml"> Project files</label>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="batchRunBtn">Run batch</button>
+        </div>
+        <div class="hint">Leave the console window open. You can close the browser &mdash; progress picks up when you come back.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ANALYZING -->
+  <div class="card hidden" id="step-analyzing">
+    <h2><span class="step-num">&hellip;</span> Analyzing</h2>
+    <div class="progresswrap">
+      <div class="progressbar"><div id="analyzeBar"></div></div>
+      <div class="progress-msg" id="analyzeMsg">Reading files and lining up the sync&hellip; this can take a few minutes for long recordings.</div>
+    </div>
+  </div>
+
+  <!-- STEP 2: REVIEW -->
+  <div class="card hidden" id="step-review">
+    <h2><span class="step-num">2</span> Review &amp; choose options</h2>
+    <div id="warningBox"></div>
+    <table id="fileTable"><thead>
+      <tr><th>Track</th><th>Type</th><th>Length</th><th>Resolution</th><th>Sync (s)</th><th>Confidence</th></tr>
+    </thead><tbody></tbody></table>
+
+    <div id="pairingSection" class="option-group hidden">
+      <label class="title">Separate mic/recorder audio</label>
+      <div id="pairingRows"></div>
+      <div class="hint">Pick which audio file each camera should use. Leave as "own audio" if the camera's built-in audio is fine.</div>
+    </div>
+
+    <div class="option-group">
+      <label class="title">Episode name <span style="font-weight:400;color:var(--muted)">(optional, used for the file names)</span></label>
+      <input type="text" id="episodeName" maxlength="60" placeholder="e.g. Episode 12 - Guest Name">
+    </div>
+
+    <div class="option-group" id="lengthGroup">
+      <label class="title">Cameras run different lengths &mdash; what should happen?</label>
+      <label class="radio-card">
+        <input type="radio" name="mode" value="keep_full" checked>
+        <div><div class="rtitle">Keep full length <span id="fullDurLabel"></span></div>
+        <div class="rdesc">Nothing gets thrown away. Cameras that haven't started yet (or already stopped) just aren't used for those moments.</div></div>
+      </label>
+      <label class="radio-card" id="trimCard">
+        <input type="radio" name="mode" value="trim">
+        <div><div class="rtitle">Trim to shortest overlap <span id="trimDurLabel"></span></div>
+        <div class="rdesc" id="trimDesc">Every camera is available for the whole video. Simpler, but you lose any lead-in/lead-out that only one camera caught.</div></div>
+      </label>
+    </div>
+
+    <div class="option-group">
+      <label class="title">Output</label>
+      <label class="radio-card">
+        <input type="checkbox" id="wantVideo" checked>
+        <div><div class="rtitle">Rendered video file</div>
+        <div class="rdesc">One finished MP4 with the cuts, sync and trimming already baked in.</div></div>
+      </label>
+      <label class="radio-card">
+        <input type="checkbox" id="wantFcpxml">
+        <div><div class="rtitle">Editable project file (FCPXML)</div>
+        <div class="rdesc">Opens in Premiere Pro / DaVinci Resolve with everything synced &mdash; the cut on the timeline, plus every camera's full footage and each mic file attached. Not test-imported into real editing software, so it may need small fixes.</div></div>
+      </label>
+      <div class="inline-controls" style="margin-top:4px">
+        <label title="Standard renders fast and looks great for review. YouTube upload takes noticeably longer but uses YouTube's recommended settings: better compression, 2-second keyframes, correct color tags, higher audio bitrate.">Export quality:
+          <select id="exportQuality" title="Standard = fast. YouTube upload = slower but tuned to YouTube's recommended upload settings.">
+            <option value="standard" selected>Standard (fast)</option>
+            <option value="youtube">YouTube upload (slower, best quality)</option>
+          </select>
+        </label>
+      </div>
+      <div class="hint">Standard is great for checking the cut. Pick YouTube quality for the final version you'll upload.</div>
+    </div>
+
+    <div class="option-group">
+      <label class="title">Extras</label>
+      <label class="radio-card" id="transcriptCard">
+        <input type="checkbox" id="wantTranscript">
+        <div><div class="rtitle">Transcript, captions &amp; YouTube chapters</div>
+        <div class="rdesc" id="transcriptDesc">Speech-to-text runs on this computer (nothing uploaded). Makes a .txt transcript, an .srt caption file, and a paste-ready YouTube chapter list.</div>
+        <div class="inline-controls" id="whisperRow"><label>Accuracy: <select id="whisperModel"><option value="fast" selected>Fast</option><option value="accurate">Accurate (slower)</option></select></label></div></div>
+      </label>
+      <label class="radio-card">
+        <input type="checkbox" id="wantClips">
+        <div><div class="rtitle">Social clips</div>
+        <div class="rdesc">Finds the highest-energy moments and cuts them as vertical (9:16) shorts for TikTok/Reels/Shorts, plus a widescreen copy of each.</div>
+        <div class="inline-controls"><label>How many: <select id="clipsCount"><option value="2">2</option><option value="3" selected>3</option><option value="5">5</option></select></label>
+        <label>Length: <select id="clipsLen"><option value="30">~30s</option><option value="45" selected>~45s</option><option value="60">~60s</option></select></label></div></div>
+      </label>
+      <label class="radio-card">
+        <input type="checkbox" id="wantTighten">
+        <div><div class="rtitle">Tighten long pauses (jump cuts)</div>
+        <div class="rdesc">Cuts out dead air automatically. Great for solo videos; use with care on relaxed two-person chats.</div>
+        <div class="inline-controls"><label>Cut pauses longer than <select id="pauseMin"><option value="1.5">1.5s</option><option value="2" selected>2s</option><option value="3">3s</option><option value="4">4s</option></select></label></div></div>
+      </label>
+    </div>
+
+    <div class="option-group">
+      <details id="colorBox">
+        <summary>Color correction</summary>
+        <div class="hint" style="margin:8px 0">Match your cameras or apply a look. Changes show in the preview thumbnails and get baked into the rendered video. (The FCPXML project file stays untouched, so you can still grade properly in your editor.)</div>
+        <div class="actions" style="margin:8px 0">
+          <button class="btn-secondary btn-small" id="addLutBtn" type="button">Add LUT file (.cube)</button>
+          <input type="file" id="lutInput" hidden accept=".cube" multiple>
+          <span class="hint" id="lutStatus"></span>
+        </div>
+        <div id="colorRows"></div>
+      </details>
+    </div>
+
+    <div class="option-group" id="audioGroup">
+      <label class="title">Audio</label>
+      <label class="radio-card">
+        <input type="radio" name="audiomode" value="mixed" checked>
+        <div><div class="rtitle">Continuous mixed audio</div>
+        <div class="rdesc">All mics blended into one smooth track, volume-leveled to podcast loudness. Usually sounds best.</div></div>
+      </label>
+      <label class="radio-card" id="audioSwitchCard">
+        <input type="radio" name="audiomode" value="switch">
+        <div><div class="rtitle">Switch audio with the camera</div>
+        <div class="rdesc">Audio changes to match whichever camera is on screen.</div></div>
+      </label>
+    </div>
+
+    <details id="advancedBox">
+      <summary>Advanced settings</summary>
+      <div class="adv-row">
+        <label>Minimum shot length</label>
+        <input type="range" id="minShot" min="0.5" max="6" step="0.25" value="2">
+        <span id="minShotVal">2.0s</span>
+      </div>
+      <div class="hint">How long a camera must stay on screen before it's allowed to cut again. Lower = snappier, higher = calmer.</div>
+      <div class="adv-row">
+        <label>Switch sensitivity</label>
+        <input type="range" id="switchMargin" min="1.02" max="1.6" step="0.01" value="1.15">
+        <span id="switchMarginVal">Balanced</span>
+      </div>
+      <div class="hint">How much louder someone needs to be before the edit cuts to them.</div>
+    </details>
+
+    <div class="actions">
+      <button class="btn-primary" id="processBtn">Make my video</button>
+      <button class="btn-secondary" id="resetBtn2">Start over</button>
+    </div>
+  </div>
+
+  <!-- PROCESSING -->
+  <div class="card hidden" id="step-processing">
+    <h2><span class="step-num">3</span> Cutting your show</h2>
+    <div class="batch-line hidden" id="batchLine"></div>
+    <div class="progresswrap">
+      <div class="progressbar"><div id="processBar"></div></div>
+      <div class="progress-msg" id="processMsg">Starting&hellip;</div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card hidden" id="step-result">
+    <h2><span class="step-num">&#10003;</span> Done</h2>
+    <div id="batchSummary"></div>
+    <video id="preview" controls hidden></video>
+    <div id="resultsList"></div>
+    <div class="actions">
+      <button class="btn-primary hidden" id="editTranscriptBtn">Edit by transcript</button>
+      <button class="btn-secondary" id="brandBtn">Add intro &amp; titles</button>
+      <button class="btn-secondary" id="resetBtn3">Start a new episode</button>
+    </div>
+    <div class="savednote" id="savedNote"></div>
+  </div>
+
+  <!-- BRANDING -->
+  <div class="card hidden" id="step-brand">
+    <h2><span class="step-num">&#9733;</span> Intro, outro &amp; titles</h2>
+    <div class="option-group">
+      <label class="title">Intro / outro videos</label>
+      <div class="inline-controls">
+        <label>Intro: <input type="file" id="introFile" accept="video/*"></label>
+        <span class="hint" id="introStatus"></span>
+      </div>
+      <div class="inline-controls">
+        <label>Outro: <input type="file" id="outroFile" accept="video/*"></label>
+        <span class="hint" id="outroStatus"></span>
+      </div>
+      <div class="hint">They're automatically resized and joined onto the episode. Timestamps in the transcript, captions, and chapters shift to match.</div>
+    </div>
+    <div class="option-group">
+      <label class="title">Animated text</label>
+      <div id="ovRows"></div>
+      <div class="actions" style="margin-bottom:6px">
+        <button class="btn-secondary btn-small" type="button" id="ovAdd">+ Add text</button>
+        <button class="btn-secondary btn-small" type="button" id="ovSpeakers">+ Name cards for each speaker</button>
+      </div>
+      <div class="hint">Name card = lower-third with name and title that fades in and out. Banner = centered strip near the bottom (great for "Subscribe" or "Thanks to our sponsor"). Times are in the current video's clock.</div>
+    </div>
+    <div class="actions">
+      <button class="btn-primary" id="brandApply">Apply branding</button>
+      <button class="btn-secondary" id="brandBack">Back</button>
+    </div>
+  </div>
+
+  <!-- TRANSCRIPT EDITOR -->
+  <div class="card hidden" id="step-transcript">
+    <h2><span class="step-num">&#9998;</span> Edit by transcript</h2>
+    <div class="hint" style="margin-bottom:10px">Click a line's <b>time or speaker</b> to strike it out (click again to restore) &mdash; struck lines get cut from the video, along with the dead time after them. <b>Shift-click</b> marks a whole range. Click the <b>text</b> to fix typos (text fixes update the transcript files, not the video).</div>
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+      <input type="text" id="trSearch" placeholder="Search the transcript&hellip; e.g. roach">
+      <button class="btn-secondary btn-small" id="trMarkShown" type="button">Strike all shown</button>
+    </div>
+    <div id="trSpeakers" class="inline-controls" style="margin-bottom:10px"></div>
+    <div id="trList" style="max-height:420px; overflow:auto; border:1px solid var(--border); border-radius:10px;"></div>
+    <div class="hint" id="trSummary" style="margin-top:8px"></div>
+    <div class="actions">
+      <button class="btn-primary" id="trApply">Apply &amp; re-cut video</button>
+      <button class="btn-secondary" id="trBack">Back</button>
+    </div>
+  </div>
+
+</div>
+
+<footer class="tm-footer">Tellinghouse Media &middot; AutoCut runs locally on your computer</footer>
+
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileinput');
+const filelistEl = document.getElementById('filelist');
+const analyzeBtn = document.getElementById('analyzeBtn');
+
+let uploaded = {}; // key (stored name, or temp key while uploading) -> {size, status, displayName}
+let uploadSeq = 0; // unique keys for in-flight uploads, so same-named files can't collide
+let lastStatus = null;
+let serverInfo = { transcribe_available: true };
+
+function projectType() {
+  return document.querySelector('input[name=ptype]:checked').value;
+}
+
+function applyModeUI() {
+  const solo = projectType() === 'solo';
+  document.getElementById('modePodcast').classList.toggle('selected', !solo);
+  document.getElementById('modeSolo').classList.toggle('selected', solo);
+  document.getElementById('dropText').textContent = solo ? 'your video (and separate mic file, if any) here' : 'your camera / mic files here';
+  document.getElementById('dropHint').textContent = solo
+    ? 'One camera video. If you recorded audio separately (lav mic, recorder), drop that in too.'
+    : "Each camera's own video file is best. You can also add separate mic/recorder audio files.";
+  document.getElementById('subtitle').textContent = solo
+    ? 'Drop in your talking-head video. It tightens the pauses, levels the audio, and makes captions and clips.'
+    : "Drop in your camera angles. It syncs them, figures out who's talking, and cuts the show for you.";
+  // sensible defaults per mode
+  document.getElementById('wantTighten').checked = solo;
+  // review-screen groups that only matter with multiple cameras
+  const multiOnly = !solo;
+  document.getElementById('lengthGroup').classList.toggle('hidden', !multiOnly);
+  document.getElementById('advancedBox').classList.toggle('hidden', !multiOnly);
+  document.getElementById('audioSwitchCard').classList.toggle('hidden', !multiOnly);
+  if (solo) document.querySelector('input[name=audiomode][value=mixed]').checked = true;
+}
+document.querySelectorAll('input[name=ptype]').forEach(r => r.addEventListener('change', applyModeUI));
+
+function fmtSize(bytes) {
+  if (bytes > 1e9) return (bytes/1e9).toFixed(1)+' GB';
+  if (bytes > 1e6) return (bytes/1e6).toFixed(1)+' MB';
+  if (bytes > 1e3) return (bytes/1e3).toFixed(1)+' KB';
+  return bytes+' B';
+}
+function fmtDur(s) {
+  if (s == null) return '--';
+  s = Math.round(s);
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return h>0 ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}` : `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function renderFileList() {
+  filelistEl.innerHTML = '';
+  Object.entries(uploaded).forEach(([key, info]) => {
+    const row = document.createElement('div');
+    row.className = 'filerow';
+    const badgeClass = info.status === 'done' ? 'ok' : (info.status === 'error' ? 'err' : 'pending');
+    const badgeText = info.status === 'done' ? 'uploaded' : (info.status === 'error' ? 'failed' : 'uploading');
+    row.innerHTML = `<span class="name"></span><span class="size">${fmtSize(info.size||0)}</span><span class="badge ${badgeClass}">${badgeText}</span>`;
+    row.querySelector('.name').textContent = info.displayName || key;
+    if (info.status === 'error') {
+      const rm = document.createElement('button');
+      rm.className = 'btn-secondary btn-small';
+      rm.textContent = 'Remove';
+      rm.addEventListener('click', () => { delete uploaded[key]; renderFileList(); });
+      row.appendChild(rm);
+    }
+    filelistEl.appendChild(row);
+  });
+  const allDone = Object.values(uploaded).length > 0 && Object.values(uploaded).every(f => f.status === 'done');
+  analyzeBtn.disabled = !allDone;
+}
+
+async function uploadOne(file) {
+  // Each in-flight upload gets its own key, so several files that share a name
+  // (two identical cameras, dropped together!) each keep their own row and end
+  // up stored under distinct names like "C0001 (2).MP4".
+  // Re-dropping an already-uploaded file (same name + size) overwrites it.
+  const existing = uploaded[file.name];
+  const overwrite = existing && existing.status === 'done' && existing.size === file.size ? 1 : 0;
+  if (overwrite) delete uploaded[file.name];
+  const tempKey = `#${++uploadSeq}`;
+  uploaded[tempKey] = {size: file.size, status: 'uploading', displayName: file.name};
+  renderFileList();
+  try {
+    const res = await fetch(`/api/upload?name=${encodeURIComponent(file.name)}&overwrite=${overwrite}`, {method:'POST', body: file});
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'upload failed');
+    delete uploaded[tempKey];
+    uploaded[data.name] = {size: file.size, status: 'done'};
+  } catch (e) {
+    uploaded[tempKey].status = 'error';
+  }
+  renderFileList();
+}
+
+function handleFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.type.startsWith('video/') || f.type.startsWith('audio/') || /\.(mp4|mov|mkv|avi|m4v|wav|mp3|m4a|aac|flac)$/i.test(f.name));
+  files.forEach(uploadOne);
+}
+
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+['dragenter','dragover'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+
+function showStep(id) {
+  ['step-upload','step-analyzing','step-review','step-processing','step-result','step-transcript','step-brand'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+
+async function getStatus() {
+  const res = await fetch('/api/status');
+  return res.json();
+}
+
+analyzeBtn.addEventListener('click', async () => {
+  showStep('step-analyzing');
+  const names = Object.keys(uploaded);
+  const res = await fetch('/api/analyze', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({files: names})});
+  const data = await res.json().catch(() => ({}));
+  if (data.error) {
+    alert('Could not analyze: ' + data.error);
+    showStep('step-upload');
+    return;
+  }
+  pollAnalyzing();
+});
+
+let analyzeFails = 0;
+async function pollAnalyzing() {
+  let s;
+  try {
+    s = await getStatus();
+    analyzeFails = 0;
+  } catch (e) {
+    if (++analyzeFails > 6) {
+      document.getElementById('analyzeMsg').textContent = 'Lost contact with AutoCut -- is the console window still open?';
+      return;
+    }
+    setTimeout(pollAnalyzing, 1200);
+    return;
+  }
+  if (s.stage === 'analyzing') {
+    document.getElementById('analyzeBar').style.width = Math.round((s.progress||0)*100) + '%';
+    if (s.message) document.getElementById('analyzeMsg').textContent = s.message + '…';
+    setTimeout(pollAnalyzing, 700);
+  } else if (s.stage === 'ready') {
+    renderReview(s);
+    showStep('step-review');
+  } else if (s.stage === 'error') {
+    alert('Could not analyze: ' + s.error);
+    showStep('step-upload');
+  } else {
+    setTimeout(pollAnalyzing, 700);
+  }
+}
+
+function confBadge(c, hasAudio) {
+  if (hasAudio === false) return `<span class="conf none" title="This file has no audio track, so it can't be auto-synced. You can type a sync value by hand.">No audio</span>`;
+  if (c == null) return '';
+  if (c >= 0.75) return `<span class="conf high">High</span>`;
+  if (c >= 0.45) return `<span class="conf med">Medium</span>`;
+  return `<span class="conf low">Low</span>`;
+}
+
+function renderReview(status) {
+  lastStatus = status;
+  serverInfo.transcribe_available = status.transcribe_available;
+  const tbody = document.querySelector('#fileTable tbody');
+  tbody.innerHTML = '';
+  const warningBox = document.getElementById('warningBox');
+  warningBox.innerHTML = '';
+  let anyLow = false, anyNoAudio = false;
+
+  const allTracks = [...status.video_files, ...status.audio_only_files];
+  allTracks.forEach(name => {
+    const f = status.files[name];
+    const isVideo = f.kind === 'video';
+    const off = status.offsets[name] ?? 0;
+    const conf = status.confidence[name];
+    if (f.has_audio === false) anyNoAudio = true;
+    else if (conf != null && conf < 0.45) anyLow = true;
+    const refTag = status.reference === name ? ' <span class="badge kind" title="Other tracks are synced relative to this one.">ref</span>' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="tname" title="${name}">${name}</span></td>
+      <td><span class="badge kind">${isVideo ? 'camera' : 'audio'}</span>${refTag}</td>
+      <td>${fmtDur(f.duration)}</td>
+      <td>${isVideo ? f.width + '&times;' + f.height : '&mdash;'}</td>
+      <td><input type="number" step="0.05" value="${off.toFixed(2)}" data-name="${name}" class="offset-input"></td>
+      <td>${confBadge(conf, f.has_audio)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  let warnings = '';
+  if (anyLow) {
+    warnings += `<div class="warning">Sync confidence looks low for at least one track. Preview the result carefully -- you can nudge the "Sync" number for a track above if it looks off (seconds; increase to delay that track, decrease to move it earlier).</div>`;
+  }
+  if (anyNoAudio) {
+    warnings += `<div class="warning">One of your files has no audio track, so it couldn't be auto-synced. If you know when it started relative to the others, type that into its "Sync" box.</div>`;
+  }
+  warningBox.innerHTML = warnings;
+
+  // transcript availability
+  const tCard = document.getElementById('transcriptCard');
+  const tBox = document.getElementById('wantTranscript');
+  if (!status.transcribe_available) {
+    tCard.classList.add('disabled');
+    tBox.checked = false;
+    tBox.disabled = true;
+    document.getElementById('transcriptDesc').textContent = 'Speech engine not installed yet -- close AutoCut and run RUN_ME.bat again to set it up.';
+  } else {
+    tCard.classList.remove('disabled');
+    tBox.disabled = false;
+  }
+
+  document.getElementById('fullDurLabel').textContent = `(${fmtDur(status.keep_full_duration)})`;
+  const trimCard = document.getElementById('trimCard');
+  const trimRadio = trimCard.querySelector('input');
+  if (status.trim_duration == null) {
+    document.getElementById('trimDurLabel').textContent = '';
+    document.getElementById('trimDesc').textContent = "Not available: these cameras never all overlap at the same time.";
+    trimRadio.disabled = true;
+    trimCard.classList.add('disabled');
+    document.querySelector('input[name=mode][value=keep_full]').checked = true;
+  } else {
+    document.getElementById('trimDurLabel').textContent = `(${fmtDur(status.trim_duration)})`;
+    document.getElementById('trimDesc').textContent = "Every camera is available for the whole video. Simpler, but you lose any lead-in/lead-out that only one camera caught.";
+    trimRadio.disabled = false;
+    trimCard.classList.remove('disabled');
+  }
+
+  const pairingSection = document.getElementById('pairingSection');
+  const pairingRows = document.getElementById('pairingRows');
+  pairingRows.innerHTML = '';
+  if (status.audio_only_files && status.audio_only_files.length) {
+    pairingSection.classList.remove('hidden');
+    status.video_files.forEach(name => {
+      const row = document.createElement('div');
+      row.className = 'adv-row';
+      let opts = `<option value="">own audio</option>`;
+      status.audio_only_files.forEach(a => opts += `<option value="${a}">${a}</option>`);
+      row.innerHTML = `<label style="min-width:220px">${name}</label><select data-pair-for="${name}">${opts}</select>`;
+      pairingRows.appendChild(row);
+    });
+  } else {
+    pairingSection.classList.add('hidden');
+  }
+
+  luts = status.luts || [];
+  document.getElementById('lutStatus').textContent = luts.length ? `${luts.length} LUT(s) loaded` : '';
+  buildColorRows(status);
+
+  applyModeUI();
+}
+
+// ---- color correction ----
+let luts = [];
+const COLOR_DEFS = [
+  ['exposure', 'Exposure', -1.5, 1.5, 0.05, 0, 'Brightness, in camera stops. Right = brighter, left = darker.'],
+  ['contrast', 'Contrast', 0.7, 1.3, 0.01, 1, 'Right = punchier darks and brights, left = flatter.'],
+  ['saturation', 'Saturation', 0, 2, 0.05, 1, 'Right = more vivid colors, left = closer to black & white.'],
+  ['warmth', 'Warmth', -1, 1, 0.05, 0, 'Right = warmer (orange), left = cooler (blue). Use to match cameras.'],
+];
+const FRAME_DEFS = [
+  ['zoom', 'Zoom', 1, 3, 0.05, 1, 'Punch in on this camera. 4K footage in a 1080p video zooms with no quality loss up to 2x.'],
+  ['panx', 'Position ⟷', -1, 1, 0.05, 0, 'When zoomed in: slide the framing window left or right.'],
+  ['pany', 'Position ↕', -1, 1, 0.05, 0, 'When zoomed in: slide the framing window up or down.'],
+];
+const ALL_CAM_DEFS = [...COLOR_DEFS, ...FRAME_DEFS];
+
+function framingParams(cam) {
+  const p = {};
+  FRAME_DEFS.forEach(([k]) => {
+    const inp = document.querySelector(`[data-cam="${CSS.escape(cam)}"][data-param="${k}"]`);
+    p[k] = inp ? inp.value : '';
+  });
+  return p;
+}
+
+document.getElementById('addLutBtn').addEventListener('click', () => document.getElementById('lutInput').click());
+document.getElementById('lutInput').addEventListener('change', async e => {
+  for (const f of Array.from(e.target.files)) {
+    const res = await fetch(`/api/upload?kind=lut&name=${encodeURIComponent(f.name)}`, {method:'POST', body: f});
+    const d = await res.json().catch(() => ({}));
+    if (d.ok && !luts.includes(d.name)) luts.push(d.name);
+  }
+  e.target.value = '';
+  document.getElementById('lutStatus').textContent = luts.length ? `${luts.length} LUT(s) loaded` : '';
+  rebuildLutSelects();
+});
+
+function rebuildLutSelects() {
+  document.querySelectorAll('[data-lut-for]').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">no LUT</option>' + luts.map(l => `<option value="${l}">${l}</option>`).join('');
+    if (luts.includes(cur)) sel.value = cur;
+  });
+}
+
+function colorParams(cam) {
+  const p = {};
+  COLOR_DEFS.forEach(([k]) => {
+    const inp = document.querySelector(`[data-cam="${CSS.escape(cam)}"][data-param="${k}"]`);
+    p[k] = inp ? inp.value : '';
+  });
+  const lutSel = document.querySelector(`select[data-lut-for="${CSS.escape(cam)}"]`);
+  p.lut = lutSel ? lutSel.value : '';
+  return p;
+}
+
+function previewUrl(cam, neutral) {
+  const p = neutral ? {exposure: 0, contrast: 1, saturation: 1, warmth: 0, lut: ''} : colorParams(cam);
+  const f = neutral ? {zoom: 1, panx: 0, pany: 0} : framingParams(cam);
+  const q = new URLSearchParams({name: cam, exposure: p.exposure, contrast: p.contrast,
+                                 saturation: p.saturation, warmth: p.warmth, lut: p.lut,
+                                 zoom: f.zoom, panx: f.panx, pany: f.pany, t: Date.now()});
+  return '/api/color_preview?' + q.toString();
+}
+
+function refreshColorPreview(cam) {
+  const img = document.querySelector(`img[data-preview-for="${CSS.escape(cam)}"]`);
+  if (img) img.src = previewUrl(cam, false);
+}
+
+function buildColorRows(status) {
+  const box = document.getElementById('colorRows');
+  box.innerHTML = '';
+  status.video_files.forEach(cam => {
+    const row = document.createElement('div');
+    row.className = 'color-row';
+    let sliders = '';
+    ALL_CAM_DEFS.forEach(([k, label, min, max, step, def, tip]) => {
+      sliders += `<label title="${tip || ''}">${label}</label><input title="${tip || ''}" type="range" min="${min}" max="${max}" step="${step}" value="${def}" data-cam="${cam}" data-param="${k}"><span data-val-for="${cam}:${k}">${def}</span>`;
+    });
+    row.innerHTML = `
+      <div class="cr-head"><span class="tname" style="flex:1" title="${cam}">${cam}</span>
+        <select data-lut-for="${cam}"><option value="">no LUT</option></select>
+        <button class="btn-secondary btn-small" type="button" data-reset-for="${cam}">Reset</button></div>
+      <div class="color-previews">
+        <figure><img data-orig-for="${cam}" alt="original"><figcaption>Original</figcaption></figure>
+        <figure><img data-preview-for="${cam}" alt="corrected"><figcaption>Corrected</figcaption></figure>
+      </div>
+      <div class="cr-sliders">${sliders}</div>`;
+    box.appendChild(row);
+  });
+  rebuildLutSelects();
+  status.video_files.forEach(cam => {
+    const orig = document.querySelector(`img[data-orig-for="${CSS.escape(cam)}"]`);
+    if (orig) orig.src = previewUrl(cam, true);
+    refreshColorPreview(cam);
+    document.querySelectorAll(`input[data-cam="${CSS.escape(cam)}"]`).forEach(inp => {
+      inp.addEventListener('input', () => {
+        const span = document.querySelector(`[data-val-for="${CSS.escape(cam)}:${inp.dataset.param}"]`);
+        if (span) span.textContent = inp.value;
+      });
+      inp.addEventListener('change', () => refreshColorPreview(cam));
+    });
+    const lutSel = document.querySelector(`select[data-lut-for="${CSS.escape(cam)}"]`);
+    if (lutSel) lutSel.addEventListener('change', () => refreshColorPreview(cam));
+    const rst = document.querySelector(`[data-reset-for="${CSS.escape(cam)}"]`);
+    if (rst) rst.addEventListener('click', () => {
+      ALL_CAM_DEFS.forEach(([k, , , , , def]) => {
+        const inp = document.querySelector(`[data-cam="${CSS.escape(cam)}"][data-param="${k}"]`);
+        if (inp) inp.value = def;
+        const span = document.querySelector(`[data-val-for="${CSS.escape(cam)}:${k}"]`);
+        if (span) span.textContent = def;
+      });
+      if (lutSel) lutSel.value = '';
+      refreshColorPreview(cam);
+    });
+  });
+}
+
+// Extras run on the rendered video, so they need that output turned on.
+document.getElementById('wantVideo').addEventListener('change', e => {
+  const on = e.target.checked;
+  [['wantTranscript', () => serverInfo.transcribe_available],
+   ['wantClips', () => true],
+   ['wantTighten', () => true]].forEach(([id, okFn]) => {
+    const el = document.getElementById(id);
+    el.disabled = !on || !okFn();
+    if (!on) el.checked = false;
+    el.closest('.radio-card').classList.toggle('disabled', el.disabled);
+  });
+});
+
+document.getElementById('minShot').addEventListener('input', e => {
+  document.getElementById('minShotVal').textContent = parseFloat(e.target.value).toFixed(2) + 's';
+});
+document.getElementById('switchMargin').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  let label = 'Balanced';
+  if (v < 1.08) label = 'Very twitchy';
+  else if (v < 1.2) label = 'Balanced';
+  else if (v < 1.4) label = 'Calm';
+  else label = 'Very calm';
+  document.getElementById('switchMarginVal').textContent = label;
+});
+
+function collectSettings() {
+  return {
+    project_type: projectType(),
+    mode: document.querySelector('input[name=mode]:checked').value,
+    audio_mode: document.querySelector('input[name=audiomode]:checked').value,
+    want_video: document.getElementById('wantVideo').checked,
+    want_fcpxml: document.getElementById('wantFcpxml').checked,
+    min_shot_sec: parseFloat(document.getElementById('minShot').value),
+    switch_margin: parseFloat(document.getElementById('switchMargin').value),
+    episode_name: document.getElementById('episodeName').value,
+    want_transcript: document.getElementById('wantTranscript').checked,
+    whisper_model: document.getElementById('whisperModel').value,
+    clips_count: document.getElementById('wantClips').checked ? parseInt(document.getElementById('clipsCount').value) : 0,
+    clips_len: parseFloat(document.getElementById('clipsLen').value),
+    want_tighten: document.getElementById('wantTighten').checked,
+    pause_min_sec: parseFloat(document.getElementById('pauseMin').value),
+    export_quality: document.getElementById('exportQuality').value,
+    color: (() => {
+      const c = {};
+      ((lastStatus && lastStatus.video_files) || []).forEach(cam => { c[cam] = colorParams(cam); });
+      return c;
+    })(),
+    framing: (() => {
+      const f = {};
+      ((lastStatus && lastStatus.video_files) || []).forEach(cam => { f[cam] = framingParams(cam); });
+      return f;
+    })(),
+  };
+}
+
+document.getElementById('processBtn').addEventListener('click', async () => {
+  const settings = collectSettings();
+  if (!settings.want_video && !settings.want_fcpxml) { alert('Pick at least one output.'); return; }
+
+  settings.offset_overrides = {};
+  document.querySelectorAll('.offset-input').forEach(inp => { settings.offset_overrides[inp.dataset.name] = inp.value; });
+  settings.audio_pairing = {};
+  document.querySelectorAll('[data-pair-for]').forEach(sel => { settings.audio_pairing[sel.dataset.pairFor] = sel.value || null; });
+
+  showStep('step-processing');
+  await fetch('/api/process', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(settings)});
+  pollProcessing();
+});
+
+// ---- batch mode ----
+document.getElementById('batchScanBtn').addEventListener('click', async () => {
+  const path = document.getElementById('batchPath').value.trim();
+  if (!path) { alert('Type the folder path first.'); return; }
+  const res = await fetch('/api/batch_scan', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({path})});
+  const data = await res.json();
+  const list = document.getElementById('batchList');
+  if (data.error) { list.innerHTML = `<div class="errorbox">${data.error}</div>`; document.getElementById('batchOptions').classList.add('hidden'); return; }
+  if (!data.episodes.length) { list.innerHTML = `<div class="warning">No episodes found. Each episode should be a subfolder containing at least one video file.</div>`; document.getElementById('batchOptions').classList.add('hidden'); return; }
+  list.innerHTML = data.episodes.map(e => `<div class="ep-row"><span class="badge kind">episode</span><span style="flex:1">${e.name}</span><span class="hint">${e.n_files} files (${e.n_video} video)</span></div>`).join('');
+  document.getElementById('batchOptions').classList.remove('hidden');
+});
+
+document.getElementById('batchRunBtn').addEventListener('click', async () => {
+  const path = document.getElementById('batchPath').value.trim();
+  const settings = {
+    mode: 'keep_full', audio_mode: 'mixed', want_video: true,
+    want_fcpxml: document.getElementById('bFcpxml').checked,
+    min_shot_sec: 2.0, switch_margin: 1.15,
+    want_transcript: document.getElementById('bTranscript').checked && serverInfo.transcribe_available,
+    whisper_model: 'fast',
+    clips_count: parseInt(document.getElementById('bClips').value),
+    clips_len: 45,
+    want_tighten: document.getElementById('bTighten').checked,
+    pause_min_sec: 2.0,
+  };
+  const res = await fetch('/api/batch_run', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({path, settings})});
+  const data = await res.json().catch(() => ({}));
+  if (data.error) { alert(data.error); return; }
+  showStep('step-processing');
+  pollProcessing();
+});
+
+let processFails = 0;
+async function pollProcessing() {
+  let s;
+  try {
+    s = await getStatus();
+    processFails = 0;
+  } catch (e) {
+    if (++processFails > 6) {
+      document.getElementById('processMsg').textContent = 'Lost contact with AutoCut -- is the console window still open?';
+      return;
+    }
+    setTimeout(pollProcessing, 1500);
+    return;
+  }
+  const batchLine = document.getElementById('batchLine');
+  let barFrac = s.progress || 0;
+  if (s.batch) {
+    batchLine.textContent = `Episode ${s.batch.index} of ${s.batch.total} — ${s.batch.episode}`;
+    batchLine.classList.remove('hidden');
+    barFrac = ((s.batch.index - 1) + (s.progress || 0)) / s.batch.total;
+  } else {
+    batchLine.classList.add('hidden');
+  }
+  document.getElementById('processBar').style.width = Math.round(barFrac * 100) + '%';
+  document.getElementById('processMsg').textContent = s.message || '';
+  if (s.stage === 'processing') {
+    setTimeout(pollProcessing, 900);
+  } else if (s.stage === 'done') {
+    showResult(s);
+  } else if (s.stage === 'error') {
+    document.getElementById('processMsg').textContent = 'Something went wrong: ' + s.error;
+  }
+}
+
+function showResult(s) {
+  showStep('step-result');
+  const preview = document.getElementById('preview');
+  if (s.has_video && !s.batch_summary) {
+    preview.src = '/api/download?id=video&t=' + Date.now();
+    preview.hidden = false;
+  } else {
+    preview.hidden = true;
+  }
+
+  const summaryBox = document.getElementById('batchSummary');
+  if (s.batch_summary && s.batch_summary.length) {
+    summaryBox.innerHTML = s.batch_summary.map(e =>
+      e.ok ? `<div class="ep-row"><span class="badge ok">done</span><span>${e.episode}</span></div>`
+           : `<div class="ep-row"><span class="badge err">failed</span><span>${e.episode}</span><span class="hint">${e.error || ''}</span></div>`
+    ).join('');
+  } else {
+    summaryBox.innerHTML = '';
+  }
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+  (s.results || []).forEach(r => {
+    if (r.name) {
+      const row = document.createElement('div');
+      row.className = 'result-row';
+      row.innerHTML = `<span class="rlabel" title="${r.name}">${r.label}</span>
+        <a href="/api/download?id=${encodeURIComponent(r.id)}"><button class="btn-secondary btn-small">Download</button></a>`;
+      list.appendChild(row);
+    } else {
+      const row = document.createElement('div');
+      row.className = 'result-info';
+      row.textContent = 'ℹ ' + r.label;
+      list.appendChild(row);
+    }
+  });
+
+  document.getElementById('editTranscriptBtn').classList.toggle('hidden', !s.transcript_ready);
+  document.getElementById('brandBtn').classList.toggle('hidden', !s.has_video || !!(s.batch_summary && s.batch_summary.length));
+  document.getElementById('savedNote').textContent = `Everything is also saved in the output folder: ${s.output_dir}`;
+}
+
+// ---- transcript editor ----
+let trState = null;
+const SPEAKER_TINTS = ['#e8e8ff', '#e2f6e6', '#fdeaea', '#fdf3d8', '#e0f4f7', '#f6e6f6'];
+
+async function openTranscriptEditor() {
+  const res = await fetch('/api/transcript');
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) { alert(data.error || 'No transcript available.'); return; }
+  trState = {
+    segments: data.segments,
+    deleted: new Set(),
+    speakers: {...data.speakers},
+    origSpeakers: {...data.speakers},
+    texts: {},
+    lastClick: null,
+  };
+  document.getElementById('trSearch').value = '';
+  renderSpeakerInputs();
+  renderTranscriptList();
+  updateTrSummary();
+  showStep('step-transcript');
+}
+document.getElementById('editTranscriptBtn').addEventListener('click', openTranscriptEditor);
+
+function speakerTint(sp) {
+  const keys = Object.keys(trState.speakers);
+  return SPEAKER_TINTS[Math.max(0, keys.indexOf(sp)) % SPEAKER_TINTS.length];
+}
+
+function renderSpeakerInputs() {
+  const box = document.getElementById('trSpeakers');
+  box.innerHTML = '';
+  const keys = Object.keys(trState.speakers);
+  if (keys.length < 2) return;
+  keys.forEach(k => {
+    const label = document.createElement('label');
+    label.append(`Rename ${k}: `);
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.value = trState.speakers[k]; inp.maxLength = 40;
+    inp.style.width = '140px';
+    inp.addEventListener('input', () => { trState.speakers[k] = inp.value; refreshSpeakerChips(); });
+    label.appendChild(inp);
+    box.appendChild(label);
+  });
+}
+
+function refreshSpeakerChips() {
+  document.querySelectorAll('#trList .tr-speaker').forEach(chip => {
+    const sp = chip.dataset.sp;
+    if (sp) chip.textContent = trState.speakers[sp] || sp;
+  });
+}
+
+function toggleRow(i, shift) {
+  if (shift && trState.lastClick !== null) {
+    const [a, b] = [Math.min(trState.lastClick, i), Math.max(trState.lastClick, i)];
+    const target = !trState.deleted.has(i);
+    for (let j = a; j <= b; j++) { if (target) trState.deleted.add(j); else trState.deleted.delete(j); }
+  } else {
+    if (trState.deleted.has(i)) trState.deleted.delete(i); else trState.deleted.add(i);
+  }
+  trState.lastClick = i;
+  syncRowStyles();
+  updateTrSummary();
+}
+
+function syncRowStyles() {
+  document.querySelectorAll('#trList .tr-row').forEach(row => {
+    row.classList.toggle('deleted', trState.deleted.has(parseInt(row.dataset.i)));
+  });
+}
+
+function renderTranscriptList() {
+  const list = document.getElementById('trList');
+  list.innerHTML = '';
+  trState.segments.forEach(seg => {
+    const row = document.createElement('div');
+    row.className = 'tr-row';
+    row.dataset.i = seg.i;
+    const t = document.createElement('span');
+    t.className = 'tr-time';
+    t.title = 'Click to strike/restore. Shift-click for a range.';
+    t.textContent = fmtDur(seg.start);
+    const chip = document.createElement('span');
+    chip.className = 'badge kind tr-speaker';
+    chip.dataset.sp = seg.speaker || '';
+    if (seg.speaker) {
+      chip.textContent = trState.speakers[seg.speaker] || seg.speaker;
+      chip.style.background = speakerTint(seg.speaker);
+      chip.title = 'Click to strike/restore. Shift-click for a range.';
+    } else {
+      chip.style.display = 'none';
+    }
+    const txt = document.createElement('span');
+    txt.className = 'tr-text';
+    try { txt.contentEditable = 'plaintext-only'; } catch (e) { txt.contentEditable = 'true'; }
+    txt.textContent = seg.text;
+    txt.addEventListener('input', () => { trState.texts[seg.i] = txt.textContent; });
+    const onToggle = e => { e.preventDefault(); toggleRow(seg.i, e.shiftKey); };
+    t.addEventListener('click', onToggle);
+    chip.addEventListener('click', onToggle);
+    row.append(t, chip, txt);
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('trSearch').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#trList .tr-row').forEach(row => {
+    const seg = trState.segments[parseInt(row.dataset.i)];
+    row.classList.toggle('hiddenrow', !!q && !seg.text.toLowerCase().includes(q));
+  });
+});
+
+document.getElementById('trMarkShown').addEventListener('click', () => {
+  document.querySelectorAll('#trList .tr-row:not(.hiddenrow)').forEach(row => trState.deleted.add(parseInt(row.dataset.i)));
+  syncRowStyles();
+  updateTrSummary();
+});
+
+function updateTrSummary() {
+  const n = trState.deleted.size;
+  let secs = 0;
+  trState.deleted.forEach(i => {
+    const next = trState.segments[i + 1];
+    secs += (next ? next.start : trState.segments[i].end + 0.5) - trState.segments[i].start;
+  });
+  document.getElementById('trSummary').textContent =
+    n ? `Striking ${n} line(s) — about ${fmtDur(secs)} will be cut from the video.` : 'Nothing marked for removal yet.';
+}
+
+document.getElementById('trApply').addEventListener('click', async () => {
+  const changedSpeakers = Object.keys(trState.speakers).some(k => trState.speakers[k] !== trState.origSpeakers[k]);
+  if (!trState.deleted.size && !Object.keys(trState.texts).length && !changedSpeakers) {
+    alert('No changes to apply yet — strike out some lines, fix text, or rename speakers first.');
+    return;
+  }
+  if (trState.deleted.size && !confirm(`Cut ${trState.deleted.size} line(s) out of the video?`)) return;
+  showStep('step-processing');
+  await fetch('/api/transcript_edit', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+    deleted: [...trState.deleted], texts: trState.texts, speakers: trState.speakers
+  })});
+  pollProcessing();
+});
+
+document.getElementById('trBack').addEventListener('click', async () => {
+  try { showResult(await getStatus()); } catch (e) { showStep('step-result'); }
+});
+
+// ---- branding: intro/outro + animated text ----
+let brandState = { intro: null, outro: null };
+
+async function uploadBumper(fileInputEl, which, statusEl) {
+  const f = fileInputEl.files && fileInputEl.files[0];
+  if (!f) return;
+  statusEl.textContent = 'uploading…';
+  try {
+    const res = await fetch(`/api/upload?kind=bumper&name=${encodeURIComponent(f.name)}`, {method:'POST', body: f});
+    const d = await res.json();
+    if (!res.ok || d.error) throw new Error(d.error || 'upload failed');
+    brandState[which] = d.name;
+    statusEl.textContent = d.name + ' ✓';
+  } catch (e) {
+    brandState[which] = null;
+    statusEl.textContent = 'failed: ' + e.message;
+  }
+}
+document.getElementById('introFile').addEventListener('change', e => uploadBumper(e.target, 'intro', document.getElementById('introStatus')));
+document.getElementById('outroFile').addEventListener('change', e => uploadBumper(e.target, 'outro', document.getElementById('outroStatus')));
+
+function addOvRow(pre) {
+  pre = pre || {};
+  const row = document.createElement('div');
+  row.className = 'adv-row ov-row';
+  row.innerHTML = `
+    <select class="ov-style" style="min-width:110px">
+      <option value="lower_third"${pre.style === 'banner' ? '' : ' selected'}>Name card</option>
+      <option value="banner"${pre.style === 'banner' ? ' selected' : ''}>Banner</option>
+    </select>
+    <input type="text" class="ov-text" placeholder="Text (e.g. Jane Doe or SUBSCRIBE)" style="flex:2" maxlength="70" value="${(pre.text || '').replace(/"/g, '&quot;')}">
+    <input type="text" class="ov-sub" placeholder="Smaller line (optional)" style="flex:1.5" maxlength="70" value="${(pre.subtext || '').replace(/"/g, '&quot;')}">
+    <label>at <input type="number" class="ov-start" min="0" step="0.5" value="${pre.start != null ? pre.start : 1}" style="width:70px"> s</label>
+    <label>for <input type="number" class="ov-dur" min="1" step="0.5" value="${pre.dur != null ? pre.dur : 4}" style="width:60px"> s</label>
+    <button class="btn-secondary btn-small ov-del" type="button">✕</button>`;
+  row.querySelector('.ov-del').addEventListener('click', () => row.remove());
+  document.getElementById('ovRows').appendChild(row);
+}
+document.getElementById('ovAdd').addEventListener('click', () => addOvRow());
+
+document.getElementById('ovSpeakers').addEventListener('click', async () => {
+  const res = await fetch('/api/transcript');
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) { alert('No transcript on this video yet — name cards need one to know when each person first talks.'); return; }
+  const seen = new Set();
+  data.segments.forEach(seg => {
+    if (seg.speaker && !seen.has(seg.speaker)) {
+      seen.add(seg.speaker);
+      addOvRow({style: 'lower_third', text: data.speakers[seg.speaker] || seg.speaker,
+                subtext: '', start: Math.round((seg.start + 0.3) * 2) / 2, dur: 4});
+    }
+  });
+  if (!seen.size) alert('No speakers found in the transcript.');
+});
+
+function collectOverlays() {
+  const out = [];
+  document.querySelectorAll('#ovRows .ov-row').forEach(row => {
+    const text = row.querySelector('.ov-text').value.trim();
+    if (!text) return;
+    out.push({
+      style: row.querySelector('.ov-style').value,
+      text,
+      subtext: row.querySelector('.ov-sub').value.trim(),
+      start: parseFloat(row.querySelector('.ov-start').value) || 0,
+      dur: parseFloat(row.querySelector('.ov-dur').value) || 4,
+    });
+  });
+  return out;
+}
+
+document.getElementById('brandBtn').addEventListener('click', () => showStep('step-brand'));
+document.getElementById('brandBack').addEventListener('click', async () => {
+  try { showResult(await getStatus()); } catch (e) { showStep('step-result'); }
+});
+document.getElementById('brandApply').addEventListener('click', async () => {
+  const overlays = collectOverlays();
+  if (!overlays.length && !brandState.intro && !brandState.outro) {
+    alert('Pick an intro/outro or add at least one text overlay first.');
+    return;
+  }
+  showStep('step-processing');
+  await fetch('/api/brand', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+    intro: brandState.intro, outro: brandState.outro, overlays
+  })});
+  pollProcessing();
+});
+
+// ---- resume previous sessions ----
+async function loadProjects() {
+  try {
+    const res = await fetch('/api/projects');
+    const data = await res.json();
+    const box = document.getElementById('projList');
+    box.innerHTML = '';
+    if (!data.projects || !data.projects.length) {
+      box.innerHTML = '<div class="hint">No saved projects yet — finish a cut and it will show up here.</div>';
+      return;
+    }
+    data.projects.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'ep-row';
+      const missing = !p.video_exists;
+      row.innerHTML = `<span class="badge kind">${p.saved_at || 'saved'}</span>
+        <span style="flex:1">${p.name}</span>
+        ${p.has_transcript ? '<span class="badge ok">transcript</span>' : ''}
+        ${missing ? '<span class="badge err">video missing</span>' : ''}`;
+      const btn = document.createElement('button');
+      btn.className = 'btn-secondary btn-small';
+      btn.textContent = 'Open';
+      btn.disabled = missing;
+      btn.addEventListener('click', async () => {
+        const r = await fetch('/api/project_load', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({file: p.file})});
+        const d = await r.json().catch(() => ({}));
+        if (d.error) { alert(d.error); return; }
+        showResult(await getStatus());
+      });
+      row.appendChild(btn);
+      box.appendChild(row);
+    });
+  } catch (e) { /* server hiccup; list stays empty */ }
+}
+document.getElementById('resumeBox').addEventListener('toggle', e => { if (e.target.open) loadProjects(); });
+
+async function resetAll() {
+  const res = await fetch('/api/reset', {method:'POST'});
+  const data = await res.json().catch(() => ({}));
+  if (data.error) { alert(data.error); return; }
+  uploaded = {};
+  renderFileList();
+  document.getElementById('episodeName').value = '';
+  document.getElementById('batchList').innerHTML = '';
+  document.getElementById('batchOptions').classList.add('hidden');
+  showStep('step-upload');
+}
+document.getElementById('resetBtn1').addEventListener('click', resetAll);
+document.getElementById('resetBtn2').addEventListener('click', resetAll);
+document.getElementById('resetBtn3').addEventListener('click', resetAll);
+
+// On load: pick up where we left off (refreshing the page is harmless).
+(async function init() {
+  applyModeUI();
+  try {
+    const s = await getStatus();
+    serverInfo.transcribe_available = s.transcribe_available;
+    if (s.stage === 'analyzing') { showStep('step-analyzing'); pollAnalyzing(); }
+    else if (s.stage === 'processing') { showStep('step-processing'); pollProcessing(); }
+    else if (s.stage === 'ready') { renderReview(s); showStep('step-review'); }
+    else if (s.stage === 'done') { showResult(s); }
+    else { fetch('/api/reset', {method:'POST'}).catch(() => {}); }
+  } catch (e) { /* server not ready yet; the upload screen is already shown */ }
+})();
+</script>
+</body>
+</html>
