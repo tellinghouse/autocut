@@ -1,0 +1,20 @@
+# Build artifacts
+dist/
+build/
+installer_out/
+ffmpeg_bundle/
+ffmpeg_dl/
+*.spec.bak
+
+# App output (finished videos, transcripts, clips, projects)
+output/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
