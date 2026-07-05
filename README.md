@@ -61,32 +61,23 @@ levels the audio, and makes captions and clips.
 
 It runs entirely on your computer -- nothing is uploaded anywhere.
 
-## One-time setup
+## Install
 
-1. Install **Python** (3.9 or newer) if you don't have it: https://www.python.org/downloads/
-   When installing, check the box that says **"Add Python to PATH."**
-   (If typing `python` in a terminal pops up the Microsoft Store, that's a
-   Windows shortcut, not real Python -- use the python.org installer.)
-2. Double-click **RUN_ME.bat**. The first run will:
-   - Try to install **ffmpeg** automatically (via `winget`, built into Windows 10/11).
-   - Set up a small local environment and install the required packages
-     (`numpy` and the `faster-whisper` speech engine). This lives in your local
-     app-data folder, not in this folder.
-   - Open AutoCut in your browser.
+1. **Download the installer:** get it from
+   [tellinghouse-autocut.netlify.app](https://tellinghouse-autocut.netlify.app),
+   or grab `AutoCut-Setup.exe` from the
+   [Releases page](https://github.com/tellinghouse/autocut/releases/latest).
+2. **Double-click `AutoCut-Setup.exe`** and follow the prompts. On first launch,
+   Windows may show a blue "Windows protected your PC" screen -- click **More
+   info**, then **Run anyway** (the installer is unsigned, which is expected for
+   an independent tool).
+3. **Launch AutoCut** from the Start menu or the desktop icon. It opens in your
+   browser.
 
-If the automatic ffmpeg install doesn't work, install it manually:
-   - Go to https://www.gyan.dev/ffmpeg/builds/ and download the "release essentials" build.
-   - Unzip it, then add its `bin` folder to your Windows PATH (search "Edit the
-     system environment variables" in the Start menu -> Environment Variables ->
-     edit `Path` -> add the folder).
-   - Close and reopen RUN_ME.bat.
-
-After the first run, starting AutoCut again is just: double-click **RUN_ME.bat**.
-
-**Prefer a normal installed app?** You can build a regular `AutoCut.exe` plus an
-`AutoCut-Setup.exe` installer (Start-menu entry, desktop icon, ffmpeg included,
-no console window) -- see **BUILDING.md**. Once installed, finished videos land
-in `Videos\AutoCut` instead of the `output` folder.
+That's the whole setup. Everything AutoCut needs -- the speech engine, ffmpeg,
+and the rest -- is bundled inside the installer, so there is nothing else for you
+to download or configure. Finished videos, transcripts, and clips are saved to a
+`Videos\AutoCut` folder in your user profile.
 
 **Note on transcription:** the first time you make a transcript, AutoCut
 downloads the speech model (one-time, needs internet, ~150 MB). After that,
@@ -106,8 +97,8 @@ transcription is fully offline.
    your episode, and pick your outputs and extras.
 5. **Click "Make my video."** Progress is shown step by step -- cutting,
    tightening, transcribing, clipping.
-6. **Download everything** from the last screen. It's all also saved in the
-   `output` folder next to AutoCut, named like `Episode 12_2026-07-04_143210.mp4`.
+6. **Download everything** from the last screen. It's all also saved in your
+   `Videos\AutoCut` folder, named like `Episode 12_2026-07-04_143210.mp4`.
 
 Refreshing the browser is always safe -- AutoCut picks up right where it was,
 even mid-render.
@@ -167,27 +158,30 @@ and nudge anything that looks off.
 
 ## Troubleshooting
 
-- **"ffmpeg/ffprobe was not found"** -- see the setup section above.
-- **"Python was not found"** -- install from python.org with "Add Python to
-  PATH" checked. The Microsoft Store `python` shortcut is not enough.
-- **Transcript option is grayed out** -- close AutoCut and run RUN_ME.bat again
-  so it can install the speech engine.
-- **Nothing opens in the browser** -- go to the address printed in the RUN_ME
-  window (usually `http://127.0.0.1:8765/`) manually.
+- **"Windows protected your PC" on first launch** -- click **More info**, then
+  **Run anyway**. This appears because the installer is unsigned, not because
+  anything is wrong.
+- **Transcript option is grayed out** -- reinstall using the latest
+  `AutoCut-Setup.exe`; the speech engine ships inside the installer.
+- **Nothing opens in the browser** -- open `http://127.0.0.1:8765/` manually. If
+  it's still blank, check the log at
+  `%LOCALAPPDATA%\TellinghouseAutoCut\autocut_log.txt`.
 - **"Could not find a free port"** -- close other copies of AutoCut you have
   running, then try again.
 - **Want a clean slate?** Click "Start over" in the app. Old renders can be
-  deleted from the `output` folder next to AutoCut.
+  deleted from your `Videos\AutoCut` folder.
 
 ## What's inside this folder
 
-- `RUN_ME.bat` -- double-click this to start AutoCut (hands off to `Start_AutoCut.bat`).
-- `tellinghouse_autocut.py` -- the local web server.
-- `autocut/` -- the syncing, editing, transcription, and rendering engine.
-- `web/` -- the browser interface.
-- `output/` -- your finished videos, transcripts, and clips land here.
-- `Build Installer.bat`, `AutoCut.spec`, `installer.iss`, `version_info.txt` --
-  build the installable desktop app (see BUILDING.md).
+Almost everyone only needs the download above. The rest is here for maintainers:
+
+- `website/` -- the AutoCut download page (published at
+  [tellinghouse-autocut.netlify.app](https://tellinghouse-autocut.netlify.app)).
+- `app/` -- the AutoCut source code plus everything needed to build the
+  installer. Double-click `app/Build Installer.bat` to produce a fresh
+  `AutoCut-Setup.exe` (details in `app/BUILDING.md`).
+- `archive/` -- the old "run from source" launcher, kept only for reference. It's
+  not needed when you use the installer.
 
 ---
 *Tellinghouse Media*
